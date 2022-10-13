@@ -57,5 +57,5 @@ EFI_STATUS __dirtool_release_file(DIRTOOL_FILE* file);
 DIRTOOL_FILE* dirtool_go_up(DIRTOOL_FILE* pwd);
 void dirtool_close_drive(DIRTOOL_STATE* state, DIRTOOL_DRIVE* drive);
 EFI_STATUS dirtool_deinit(DIRTOOL_STATE* state);
-CHAR8* dirtool_read_file(DIRTOOL_FILE* file);
+CHAR8* dirtool_read_file(EFI_MEMORY_TYPE type, DIRTOOL_FILE* file);
 #endif

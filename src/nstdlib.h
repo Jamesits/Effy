@@ -4,9 +4,9 @@
 
 #include <efi.h>
 #include <efilib.h>
+#include <efidef.h>
 
-void* malloc(UINTN poolSize);
-void* malloc_acpi(UINTN poolSize);
+void* malloc(EFI_MEMORY_TYPE type, UINTN poolSize);
 void free(void* pool);
 void memcpy8(CHAR8* dst, CHAR8* src, UINTN size);
 void memcpy16(CHAR16* dst, CHAR16* src, UINTN size);

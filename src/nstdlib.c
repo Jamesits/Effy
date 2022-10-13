@@ -2,34 +2,13 @@
 #include "nstdlib.h"
 
 // from https://stackoverflow.com/a/51575086
-// allocate some memory (reclaimable after program quit)
-void* malloc(UINTN poolSize)
+// allocate some memory
+// EfiLoaderData: freed after program exit
+// EfiACPIReclaimMemory: will not be reused by Windows and should be retained after OS boot
+void* malloc(EFI_MEMORY_TYPE type, UINTN poolSize)
 {
 	void* handle;
-	EFI_STATUS status = uefi_call_wrapper(BS->AllocatePool, 3, EfiLoaderData, poolSize, &handle);
-
-	if (status == EFI_OUT_OF_RESOURCES)
-	{
-		Print(L"malloc() OUT_OF_RESOURCES\n");
-		return 0;
-	}
-	else if (status == EFI_INVALID_PARAMETER)
-	{
-		Print(L"malloc() INVALID_PARAMETER\n");
-		return 0;
-	}
-	else
-	{
-		return handle;
-	}
-}
-
-// allocate some memory as ACPI reclaim memory
-// These will not be reused by Windows and should be retained after OS boot
-void* malloc_acpi(UINTN poolSize)
-{
-	void* handle;
-	EFI_STATUS status = uefi_call_wrapper(BS->AllocatePool, 3, EfiACPIReclaimMemory, poolSize, &handle);
+	EFI_STATUS status = uefi_call_wrapper(BS->AllocatePool, 3, type, poolSize, &handle);
 
 	if (status == EFI_OUT_OF_RESOURCES)
 	{

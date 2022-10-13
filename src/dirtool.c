@@ -29,7 +29,7 @@ EFI_STATUS dirtool_init(DIRTOOL_STATE* state, EFI_HANDLE ImageHandle)
 	}
 
 	state->DriveCount = HandleCount;
-	state->Drives = malloc(HandleCount * sizeof(DIRTOOL_DRIVE));
+	state->Drives = malloc(EfiBootServicesData, HandleCount * sizeof(DIRTOOL_DRIVE));
 	if (state->Drives == NULL)
 	{
 		return EFI_OUT_OF_RESOURCES;
@@ -60,7 +60,7 @@ EFI_STATUS dirtool_init(DIRTOOL_STATE* state, EFI_HANDLE ImageHandle)
 DIRTOOL_DRIVE_ITERATOR *dirtool_drive_iterator_start(DIRTOOL_STATE* state)
 {
 	if (!state->initialized) return NULL;
-	DIRTOOL_DRIVE_ITERATOR* ret = malloc(sizeof(DIRTOOL_DRIVE_ITERATOR));
+	DIRTOOL_DRIVE_ITERATOR* ret = malloc(EfiBootServicesData, sizeof(DIRTOOL_DRIVE_ITERATOR));
 	if (ret == NULL) return NULL;
 	ret->current = 0;
 	return ret;
@@ -183,7 +183,7 @@ DIRTOOL_FILE *dirtool_cd(DIRTOOL_FILE *pwd, CHAR16 *NewFileName)
 		return NULL;
 	}
 	// Print(L"dirtool_cd() %s -> %s\n", pwd->Path, NewFileName);
-	DIRTOOL_FILE *NewFile = malloc(sizeof(DIRTOOL_FILE));
+	DIRTOOL_FILE *NewFile = malloc(EfiBootServicesData, sizeof(DIRTOOL_FILE));
 
 	// Print(L"FileHandle->Open()\n");
 	EFI_STATUS status = pwd->FileHandle->Open(pwd->FileHandle, &(NewFile->FileHandle), NewFileName, EFI_FILE_MODE_READ, 0);
@@ -261,7 +261,7 @@ DIRTOOL_FILE* dirtool_cd_multi(DIRTOOL_FILE* pwd, CHAR16* Path)
 		UINTN i;
 		for (i = 0; Path[i] != split && Path[i] != 0; ++i) {};
 		// Print(L"dirtool_cd_multi() len=%u\n", i);
-		CHAR16* PathSegment = malloc(sizeof(CHAR16) * (i + 1));
+		CHAR16* PathSegment = malloc(EfiBootServicesData, sizeof(CHAR16) * (i + 1));
 		memcpy16(PathSegment, Path, i);
 		PathSegment[i] = 0;
 		// Print(L"dirtool_cd_multi() PathSegment=%s\n", PathSegment);
@@ -349,7 +349,7 @@ EFI_STATUS dirtool_deinit(DIRTOOL_STATE* state)
 }
 
 // read a file into buffer; assume caller call free()
-CHAR8 *dirtool_read_file(DIRTOOL_FILE *file)
+CHAR8 *dirtool_read_file(EFI_MEMORY_TYPE type, DIRTOOL_FILE *file)
 {
 	if (!file)
 	{
@@ -379,7 +379,7 @@ CHAR8 *dirtool_read_file(DIRTOOL_FILE *file)
 	// FileSize is the file's actual size
 	// PhysicalSize is the file's size + padding on disk
 	UINTN bufsize = file->FileInfo->FileSize;
-	CHAR8* buf = malloc(bufsize);
+	CHAR8* buf = malloc(type, bufsize);
 	if (buf)
 	{
 		// Print(L"dirtool_read_file() buf_size=%u\n", bufsize);
